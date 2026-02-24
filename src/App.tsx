@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useEffect } from "react";
+import { Toaster } from "sonner";
+import { useAuthStore } from "./stores/useAuthStore";
+import { useThemeStore } from "./stores/useThemeStore";
+import SignUpSignIn from "./components/SignUpSignIn";
+import Dashboard from "./components/Dashboard";
+import Loader from "./components/Loader";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { user, loading, initAuth } = useAuthStore();
+  const { theme, initTheme } = useThemeStore();
+
+  useEffect(() => {
+    initAuth();
+    initTheme();
+  }, [initAuth, initTheme]);
+
+  // Apply theme to document
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="min-h-screen bg-background text-foreground">
+        <Toaster position="top-center" richColors />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              user ? <Navigate to="/dashboard" replace /> : <SignUpSignIn />
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={user ? <Dashboard /> : <Navigate to="/" replace />}
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;
