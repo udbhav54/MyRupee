@@ -233,8 +233,8 @@ export default function Dashboard() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ category, value }) =>
-                            `${category}: ₹${value.toLocaleString("en-IN")}`
+                          label={(entry: any) =>
+                            `${entry.category}: ₹${entry.value.toLocaleString("en-IN")}`
                           }
                           outerRadius={80}
                           fill="#8884d8"
